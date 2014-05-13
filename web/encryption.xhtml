@@ -1,0 +1,102 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                template="template.xhtml">
+    <ui:define name="title">
+        Tools - Isabel
+    </ui:define>
+    <ui:define name="content">
+        <h:form id="toolsEncryption"  >
+            <h:panelGrid >
+                <p:row>
+                    <p:column >
+                        <p:selectOneMenu id="encryptionAlgorithm" value="#{encryptionBean.algorithm}" maxlength="54"  >  
+                            <f:selectItem  itemLabel="Select encryption algorithm" itemValue="" />  
+                            <f:selectItem itemLabel="AES/CBC/NoPadding (128)" itemValue="AES/CBC/NoPadding (128)" />  
+                            <f:selectItem itemLabel="AES/CBC/PKCS5Padding (128)" itemValue="AES/CBC/PKCS5Padding (128)" />  
+                            <f:selectItem itemLabel="AES/ECB/NoPadding (128)" itemValue="AES/ECB/NoPadding (128)" />  
+                            <f:selectItem itemLabel="AES/ECB/PKCS5Padding (128)" itemValue="AES/ECB/PKCS5Padding (128)" />  
+                            <f:selectItem itemLabel="DES/CBC/NoPadding (56)" itemValue="DES/CBC/NoPadding (56)" />  
+                            <f:selectItem itemLabel="DES/CBC/PKCS5Padding (56)" itemValue="DES/CBC/PKCS5Padding (56)" />  
+                            <f:selectItem itemLabel="DES/ECB/NoPadding (56)" itemValue="DES/ECB/NoPadding (56)" />  
+                            <f:selectItem itemLabel="DES/ECB/PKCS5Padding (56)" itemValue="DES/ECB/PKCS5Padding (56)" />  
+                            <f:selectItem itemLabel="DESede/CBC/NoPadding (168)" itemValue="DESede/CBC/NoPadding (168)" />  
+                            <f:selectItem itemLabel="DESede/CBC/PKCS5Padding (168)" itemValue="DESede/CBC/PKCS5Padding (168)" />  
+                            <f:selectItem itemLabel="DESede/ECB/NoPadding (168)" itemValue="DESede/ECB/NoPadding (168)" />  
+                            <f:selectItem itemLabel="DESede/ECB/PKCS5Padding (168)" itemValue="DESede/ECB/PKCS5Padding (168)" />  
+                            <f:selectItem itemLabel="RSA/ECB/PKCS1Padding (1024)" itemValue="RSA/ECB/PKCS1Padding (1024)" />  
+                            <f:selectItem itemLabel="RSA/ECB/PKCS1Padding (2048)" itemValue="RSA/ECB/PKCS1Padding (2048)" />  
+                            <f:selectItem itemLabel="RSA/ECB/OAEPWithSHA-1AndMGF1Padding (1024)" itemValue="RSA/ECB/OAEPWithSHA-1AndMGF1Padding (1024)" />  
+                            <f:selectItem itemLabel="RSA/ECB/OAEPWithSHA-1AndMGF1Padding (2048)" itemValue="RSA/ECB/OAEPWithSHA-1AndMGF1Padding (2048)" />  
+                            <f:selectItem itemLabel="RSA/ECB/OAEPWithSHA-256AndMGF1Padding (1024)" itemValue="RSA/ECB/OAEPWithSHA-256AndMGF1Padding (1024)" />  
+                            <f:selectItem itemLabel="RSA/ECB/OAEPWithSHA-256AndMGF1Padding (2048)" itemValue="RSA/ECB/OAEPWithSHA-256AndMGF1Padding (2048)" />  
+                        </p:selectOneMenu>  
+                    </p:column>
+                </p:row>
+                <p:row>
+                    <p:column >
+                        <p:selectOneMenu id="secretKeyFactoryAlgorithm" value="#{encryptionBean.secretKeyFactory}" style="width: 450px;" >  
+                            <f:selectItem  itemLabel="Select secret key factory algorithm" itemValue="" />  
+                            <f:selectItem itemLabel="AES" itemValue="AES" />  
+                            <f:selectItem itemLabel="ARCFOUR" itemValue="ARCFOUR" />  
+                            <f:selectItem itemLabel="DES" itemValue="DES" />  
+                            <f:selectItem itemLabel="DESede" itemValue="DESede" />  
+                            <f:selectItem itemLabel="PBKDF2WithHmacSHA1" itemValue="PBKDF2WithHmacSHA1" />  
+                            <f:selectItem itemLabel="PBEWithMD5AndDES" itemValue="PBEWithMD5AndDES" />  
+                            <f:selectItem itemLabel="PBEWithHmacSHA1AndDESede" itemValue="PBEWithHmacSHA1AndDESede" />  
+
+                        </p:selectOneMenu>  
+                    </p:column>
+                </p:row>
+                <p:row>
+                    <p:column>
+                        <p:password 
+                            value="#{encryptionBean.password}"
+                            id="passwordListTextarea"
+                            placeholder="Password"
+                            style="width: 450px">
+                            
+                        </p:password>
+                    </p:column>
+                </p:row>
+                <p:row>
+                    <p:column>
+                        <p:inputTextarea 
+                            value="#{encryptionBean.plainText}"
+                            autoResize="false"  
+                            scrollHeight="100" 
+                            id="plainText" 
+                            rows="5" 
+                            cols="54" 
+                            placeholder="Plain text">
+                        </p:inputTextarea>
+                    </p:column>
+                </p:row>
+                <p:row>
+                    <p:column>
+                        <p:inputTextarea 
+                            value="#{encryptionBean.encryptedText}"
+                            autoResize="false"  
+                            scrollHeight="100" 
+                            id="encryptedText" 
+                            rows="5" 
+                            cols="54" 
+                            placeholder="Encrypted text">
+                        </p:inputTextarea>
+                    </p:column>
+                </p:row>
+                <p:row>
+                    <p:commandButton value="Encrypt" 
+                                     id="submitTask" 
+                                     actionListener="#{encryptionBean.doEncrypt}"
+                                     update="encryptedText"
+                                     />
+                </p:row>
+            </h:panelGrid>
+        </h:form>
+
+
+    </ui:define>
+</ui:composition>

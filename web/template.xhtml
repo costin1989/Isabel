@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"  
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <h:head>
+        <title>
+            <ui:insert name="title"/>
+        </title>
+        <h:outputStylesheet library="resources" name="css/styles.css"/>
+    </h:head>
+    <h:body>
+        <p:layout fullPage="true" id="body">
+            <p:layoutUnit position="north" collapsible="false" id="menu" resizable="false" styleClass="menuLayout" >
+                <ui:include src="menu.xhtml"/>
+            </p:layoutUnit>
+            <p:layoutUnit position="center" 
+                          collapsible="false" 
+                          footer="&copy; Ovidiu-Costin Dobrescu - IT&amp;C Security Master - 2014"
+                          styleClass="footer">
+                <p:growl id="growl" life="4000" showDetail="true" />
+                <ui:insert name="content"/>
+            </p:layoutUnit>
+        </p:layout>
+    </h:body>
+</html>
+

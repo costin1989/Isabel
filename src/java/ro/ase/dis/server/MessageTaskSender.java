@@ -2,7 +2,6 @@ package ro.ase.dis.server;
 
 import javax.annotation.Resource;
 import javax.ejb.Stateful;
-import javax.ejb.Stateless;
 import javax.jms.*;
 
 @Stateful
@@ -39,7 +38,6 @@ public class MessageTaskSender {
                 textMessage.setJMSDeliveryMode(DeliveryMode.PERSISTENT);
 
                 textMessage.setText(message);
-                messageProducer.send(textMessage);
                 messageProducer.send(textMessage);
             }
         } catch (JMSException e) {

@@ -6,7 +6,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 
 public class PasswordReader {
-    private BufferedReader br;
+    private final BufferedReader br;
     private static PasswordReader instance;
     
     private PasswordReader(){

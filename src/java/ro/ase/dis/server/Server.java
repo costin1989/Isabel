@@ -20,6 +20,16 @@ public class Server extends HttpServlet {
     @EJB
     MessageSubjectSender subjectSender;
     private static long passwordCounter;
+    private final int validationCounter = 2;
+    private final int bunchSize = 10;
+    private final int maxPasswordsLength = 2;
+
+    
+    private enum taskTypes {
+
+        BRUTE_FORCE, DICTIONARY
+    };
+    private final taskTypes taskType = taskTypes.BRUTE_FORCE;
 
     protected void processGetRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -46,19 +56,52 @@ public class Server extends HttpServlet {
             System.out.println("Subject sent:" + encryptMessage + " Time: " + new Date().getTime());
 
             taskSender.connect();
-            for (int i = 0; i < 50; i++) {
-                String message = "";
-                for (int j = 0; j < 10; j++) {
-                    message += PasswordReader.getInstance().readPassword() + ",";
-                }
-                message += PasswordReader.getInstance().readPassword();
-                taskSender.sendMessage(message);
-                passwordCounter += 20;
+            switch (taskType) {
+                case DICTIONARY:
+                    dictionaryTaskSender();
+                    break;
+                case BRUTE_FORCE:
+                    bruteForceTaskSender(maxPasswordsLength);
+                    break;
             }
+            
             taskSender.disconnect();
             out.format(" %1$s  passwords sent!", passwordCounter);
             out.println("<br/>");
             t.cancel();
+        }
+    }
+
+    private void dictionaryTaskSender() {
+        for (int i = 0; i < 500; i++) {
+            String message = "";
+            for (int j = 0; j < bunchSize; j++) {
+                message += PasswordReader.getInstance().readPassword() + ",";
+            }
+            message += PasswordReader.getInstance().readPassword();
+            for (int k = 0; k < validationCounter; k++) {
+                taskSender.sendMessage(message);
+            }
+
+            passwordCounter += validationCounter * bunchSize;
+        }
+    }
+
+    private void bruteForceTaskSender(int maxPasswordsLength)  {
+        if(maxPasswordsLength < 1){
+            throw new IllegalArgumentException();
+        }
+        createWords("", maxPasswordsLength);
+    }
+
+    private void createWords(String base, int maxPasswordsLength) {
+        for(char c='a';c<='z';c++){
+            if(maxPasswordsLength == 1){
+                taskSender.sendMessage(base+c);
+                passwordCounter += 1;
+            } else {
+                createWords(base+c, maxPasswordsLength-1);
+            }
         }
     }
 

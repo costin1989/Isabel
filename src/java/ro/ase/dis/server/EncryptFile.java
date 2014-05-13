@@ -35,7 +35,7 @@ public class EncryptFile {
      */
     public static String getEncryptFile() {
         try {
-            String message = "passwordpassword";
+            String message = "This is a secret message!";
             System.out.println("Plaintext: " + message + "\n");
 
             SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");

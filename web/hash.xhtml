@@ -1,0 +1,64 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                template="template.xhtml">
+    <ui:define name="title">
+        Tools - Isabel
+    </ui:define>
+    <ui:define name="content">
+        <h:form id="toolsHash"  >
+            <h:panelGrid>
+                 <p:row>
+                    <p:column >
+                        <p:selectOneMenu id="hashAlgorithm" value="#{hashBean.hashAlgorithm}" style="width: 450px;" >  
+                            <f:selectItem  itemLabel="Select hash algorithm" itemValue="" />  
+                            <f:selectItem itemLabel="MD2" itemValue="MD2" /> 
+                            <f:selectItem itemLabel="MD5" itemValue="MD5" />  
+                            <f:selectItem itemLabel="SHA-128" itemValue="SHA-1" />  
+                            <f:selectItem itemLabel="SHA-256" itemValue="SHA-256" />  
+                            <f:selectItem itemLabel="SHA-512" itemValue="SHA-512" /> 
+                        </p:selectOneMenu>  
+                    </p:column>
+                </p:row>
+                <p:row>
+                    <p:column>
+                        <p:inputTextarea 
+                            value="#{hashBean.plainText}"
+                            autoResize="false"  
+                            scrollHeight="100" 
+                            id="plainText" 
+                            rows="2" 
+                            cols="54" 
+                            placeholder="Plain text">
+                        </p:inputTextarea>
+                    </p:column>
+                </p:row>
+                <p:row>
+                    <p:column>
+                        <p:inputTextarea 
+                            value="#{hashBean.hashText}"
+                            autoResize="false"  
+                            scrollHeight="100" 
+                            id="hashText" 
+                            rows="2" 
+                            cols="54" 
+                            placeholder="Encrypted text">
+                        </p:inputTextarea>
+                    </p:column>
+                </p:row>
+                <p:row>
+                    <p:commandButton value="Hash" 
+                                     id="submitTask" 
+                                     actionListener="#{hashBean.doHash}"
+                                     update="hashText"
+                                     />
+                </p:row>
+            </h:panelGrid>
+
+        </h:form>
+
+
+    </ui:define>
+</ui:composition>

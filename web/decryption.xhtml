@@ -1,0 +1,194 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                template="template.xhtml">
+    <ui:define name="title">
+        Configuration - Isabel
+    </ui:define>
+    <ui:define name="content">
+        <h:form id="setupForm"  enctype="multipart/form-data" >
+            <h:panelGrid id="configPanel" > 
+                <p:row>
+                    <p:column colspan="2">
+                        <p:selectOneMenu id="encryptionAlgorithm" value="#{decryptionBean.algorithm}" maxlength="54"  >  
+                            <f:selectItem  itemLabel="Select encryption algorithm" itemValue="" />  
+                            <f:selectItem itemLabel="AES/CBC/NoPadding (128)" itemValue="AES/CBC/NoPadding (128)" />  
+                            <f:selectItem itemLabel="AES/CBC/PKCS5Padding (128)" itemValue="AES/CBC/PKCS5Padding (128)" />  
+                            <f:selectItem itemLabel="AES/ECB/NoPadding (128)" itemValue="AES/ECB/NoPadding (128)" />  
+                            <f:selectItem itemLabel="AES/ECB/PKCS5Padding (128)" itemValue="AES/ECB/PKCS5Padding (128)" />  
+                            <f:selectItem itemLabel="DES/CBC/NoPadding (56)" itemValue="DES/CBC/NoPadding (56)" />  
+                            <f:selectItem itemLabel="DES/CBC/PKCS5Padding (56)" itemValue="DES/CBC/PKCS5Padding (56)" />  
+                            <f:selectItem itemLabel="DES/ECB/NoPadding (56)" itemValue="DES/ECB/NoPadding (56)" />  
+                            <f:selectItem itemLabel="DES/ECB/PKCS5Padding (56)" itemValue="DES/ECB/PKCS5Padding (56)" />  
+                            <f:selectItem itemLabel="DESede/CBC/NoPadding (168)" itemValue="DESede/CBC/NoPadding (168)" />  
+                            <f:selectItem itemLabel="DESede/CBC/PKCS5Padding (168)" itemValue="DESede/CBC/PKCS5Padding (168)" />  
+                            <f:selectItem itemLabel="DESede/ECB/NoPadding (168)" itemValue="DESede/ECB/NoPadding (168)" />  
+                            <f:selectItem itemLabel="DESede/ECB/PKCS5Padding (168)" itemValue="DESede/ECB/PKCS5Padding (168)" />  
+                            <f:selectItem itemLabel="RSA/ECB/PKCS1Padding (1024)" itemValue="RSA/ECB/PKCS1Padding (1024)" />  
+                            <f:selectItem itemLabel="RSA/ECB/PKCS1Padding (2048)" itemValue="RSA/ECB/PKCS1Padding (2048)" />  
+                            <f:selectItem itemLabel="RSA/ECB/OAEPWithSHA-1AndMGF1Padding (1024)" itemValue="RSA/ECB/OAEPWithSHA-1AndMGF1Padding (1024)" />  
+                            <f:selectItem itemLabel="RSA/ECB/OAEPWithSHA-1AndMGF1Padding (2048)" itemValue="RSA/ECB/OAEPWithSHA-1AndMGF1Padding (2048)" />  
+                            <f:selectItem itemLabel="RSA/ECB/OAEPWithSHA-256AndMGF1Padding (1024)" itemValue="RSA/ECB/OAEPWithSHA-256AndMGF1Padding (1024)" />  
+                            <f:selectItem itemLabel="RSA/ECB/OAEPWithSHA-256AndMGF1Padding (2048)" itemValue="RSA/ECB/OAEPWithSHA-256AndMGF1Padding (2048)" />  
+                            <p:ajax event="change" update=":confirmTask" />
+                        </p:selectOneMenu>  
+                    </p:column>
+                </p:row>
+                <p:row>
+                    <p:column colspan="2">
+                        <p:selectOneMenu id="secretKeyFactoryAlgorithm" value="#{decryptionBean.secretKeyFactory}" style="width: 450px;" >  
+                            <f:selectItem  itemLabel="Select secret key factory algorithm" itemValue="" />  
+                            <f:selectItem itemLabel="AES" itemValue="AES" />  
+                            <f:selectItem itemLabel="ARCFOUR" itemValue="ARCFOUR" />  
+                            <f:selectItem itemLabel="DES" itemValue="DES" />  
+                            <f:selectItem itemLabel="DESede" itemValue="DESede" />  
+                            <f:selectItem itemLabel="PBKDF2WithHmacSHA1" itemValue="PBKDF2WithHmacSHA1" />  
+                            <f:selectItem itemLabel="PBEWithMD5AndDES" itemValue="PBEWithMD5AndDES" />  
+                            <f:selectItem itemLabel="PBEWithHmacSHA1AndDESede" itemValue="PBEWithHmacSHA1AndDESede" />  
+                            <p:ajax event="change" update=":confirmTask"/>
+                            
+                        </p:selectOneMenu>  
+                    </p:column>
+                </p:row>
+                <p:row>
+                    <p:column>
+                        <p:inputTextarea 
+                            value="#{decryptionBean.encryptedText}"
+                            autoResize="false"  
+                            scrollHeight="100" 
+                            id="encryptedTextTextarea" 
+                            rows="5" 
+                            cols="54" 
+                            placeholder="Encrypted text (Base 64)">
+                            <p:ajax event="blur" update=":confirmTask" />
+                        </p:inputTextarea>
+                    </p:column>
+                    <p:column>
+                        <p:fileUpload allowTypes="/(\.|\/)(txt|doc)$/" 
+                                      id="encryptedTextFile" 
+                                      mode="advanced" 
+                                      label="Choose encrypted text file" 
+                                      auto="true" 
+                                      update="encryptedTextTextarea"
+                                      fileUploadListener="#{decryptionBean.encryptedTextFileUploadListener}"
+                                      />
+                    </p:column>
+                </p:row>
+                <p:row>
+                    <p:column>
+
+                        <p:selectBooleanCheckbox value="#{decryptionBean.bruteForce}" itemLabel="Brute force">  
+                            <p:ajax update="passwordListTextarea passwordListFile passwordsText :confirmTask bruteForceLenght"  />  
+                        </p:selectBooleanCheckbox>  
+                        <p:selectOneMenu id="bruteForceLenght" 
+                                         value="#{decryptionBean.bruteForceLength}" 
+                                         style="width: 150px;"
+                                         widgetVar="bruteForceLength"
+                                         disabled="#{!decryptionBean.bruteForce}"
+                                        >  
+                            <f:selectItem  itemLabel="chars #" itemValue="0" />  
+                            <f:selectItem itemLabel="1" itemValue="1" />  
+                            <f:selectItem itemLabel="2" itemValue="2" />  
+                            <f:selectItem itemLabel="3" itemValue="3" />  
+                            <f:selectItem itemLabel="4" itemValue="4" />  
+                            <f:selectItem itemLabel="5" itemValue="5" />  
+                            <f:selectItem itemLabel="6" itemValue="6" />  
+                            <f:selectItem itemLabel="7" itemValue="7" />  
+                            <p:ajax event="change" update=":confirmTask passwordsText"/>
+                            
+                        </p:selectOneMenu>  
+                    </p:column>
+                </p:row>
+                <p:row>
+                    <p:column>
+                        <p:selectBooleanCheckbox value="#{decryptionBean.defaultPasswordList}" itemLabel="Default password list">  
+                            <p:ajax update="passwordListTextarea passwordListFile passwordsText :confirmTask"  />  
+                        </p:selectBooleanCheckbox>  
+                    </p:column>
+                </p:row>
+                <p:row>
+                    <p:column>
+                        <p:inputTextarea 
+                            value="#{decryptionBean.passwordList}"
+                            autoResize="false"  
+                            scrollHeight="100" 
+                            id="passwordListTextarea" 
+                            rows="5" 
+                            cols="54" 
+                            placeholder="Password list (one by line)"
+                            disabled="#{decryptionBean.defaultPasswordList or decryptionBean.bruteForce}" >
+                            <p:ajax event="blur" update="passwordsText :confirmTask" />
+                        </p:inputTextarea>
+
+                    </p:column>
+                </p:row>
+                <p:row>
+                    <p:column>
+                        <h:outputText value="#{decryptionBean.passwords}" id="passwordsText" />
+                        <h:outputText value=" passwords" />
+                    </p:column>
+                </p:row>
+                <p:row>
+                    <p:column>
+                        <p:fileUpload allowTypes="/(\.|\/)(txt|doc)$/" 
+                                      id="passwordListFile" 
+                                      mode="advanced" 
+                                      label="Choose password list file" 
+                                      auto="true"
+                                      fileUploadListener="#{decryptionBean.passwordListFileUploadListener}"
+                                      update="passwordListTextarea passwordsText"
+                                      disabled="#{decryptionBean.defaultPasswordList}"/>
+                    </p:column>
+                </p:row>
+                <p:row>
+                    <p:commandButton value="Start task" 
+                                     type="button"
+                                     id="submitTask" 
+
+                                     onclick="PF('confirmTaskWidget').show()" />
+                    <p:commandButton value="Reset params" 
+                                     process="@this" 
+                                     actionListener="#{decryptionBean.resetConfigPanel}"
+                                     update="configPanel"/>
+                </p:row>
+            </h:panelGrid>
+        </h:form>
+
+        <p:confirmDialog global="false" 
+                         appendTo="@(body)"
+                         visible="false"
+                         id="confirmTask"
+                         widgetVar="confirmTaskWidget"
+                         header="Confirm task"
+                         message="Do you agree to start the task with following parameters:"
+                         >
+            <h:form>
+                <h:outputText value="#{decryptionBean.algorithm} encryption algorithm"/><br/>
+                <h:outputText value="#{decryptionBean.secretKeyFactory} secret key factory algorithm"/><br/>
+                <h:outputText value="#{decryptionBean.passwords} passwords"/><br/><br/>
+                <p:commandButton value="Yes" 
+
+                                 styleClass="ui-confirmdialog-yes" 
+                                 icon="ui-icon-check"
+                                 actionListener="#{decryptionBean.sendTask}"
+                                 ajax="true"
+                                 oncomplete="PF('confirmTaskWidget').hide(); PF('progresBarDialog').show(); PF('pbAjax').start();"/>  
+                <p:commandButton value="No" 
+                                 type="button" 
+                                 styleClass="ui-confirmdialog-no" 
+                                 icon="ui-icon-close"
+                                 onclick="PF('confirmTaskWidget').hide()"/>   
+            </h:form>
+        </p:confirmDialog>
+
+        <p:dialog id="progresBar" widgetVar="progresBarDialog" visible="true" modal="false" >
+            <p:progressBar widgetVar="pbAjax" ajax="true" value="#{decryptionBean.progress}" labelTemplate="{value}%" styleClass="progresBar" global="false">
+                <p:ajax event="complete" listener="#{decryptionBean.onComplete}" update="growl" oncomplete="startButton2.enable()"/>
+            </p:progressBar>
+        </p:dialog>
+
+
+    </ui:define>
+</ui:composition>
