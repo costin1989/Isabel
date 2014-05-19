@@ -79,12 +79,14 @@
                 <p:row>
                     <p:column>
 
-                        <p:selectBooleanCheckbox value="#{decryptionBean.bruteForce}" itemLabel="Brute force">  
-                            <p:ajax update="passwordListTextarea passwordListFile passwordsText :confirmTask bruteForceLenght"  />  
+                        <p:selectBooleanCheckbox id="bruteForce" 
+                                                 value="#{decryptionBean.bruteForce}" 
+                                                 itemLabel="Brute force">  
+                            <p:ajax update="passwordListTextarea passwordListFile passwordsText :confirmTask bruteForceLenght defaultPasswordList customPasswords"  />  
                         </p:selectBooleanCheckbox>  
                         <p:selectOneMenu id="bruteForceLenght" 
                                          value="#{decryptionBean.bruteForceLength}" 
-                                         style="width: 150px;"
+                                         style="width: 100px;"
                                          widgetVar="bruteForceLength"
                                          disabled="#{!decryptionBean.bruteForce}"
                                         >  
@@ -97,14 +99,24 @@
                             <f:selectItem itemLabel="6" itemValue="6" />  
                             <f:selectItem itemLabel="7" itemValue="7" />  
                             <p:ajax event="change" update=":confirmTask passwordsText"/>
-                            
                         </p:selectOneMenu>  
                     </p:column>
                 </p:row>
                 <p:row>
                     <p:column>
-                        <p:selectBooleanCheckbox value="#{decryptionBean.defaultPasswordList}" itemLabel="Default password list">  
-                            <p:ajax update="passwordListTextarea passwordListFile passwordsText :confirmTask"  />  
+                        <p:selectBooleanCheckbox id="defaultPasswordList" 
+                                                 value="#{decryptionBean.defaultPasswordList}" 
+                                                 itemLabel="Default password list">  
+                            <p:ajax update="passwordListTextarea passwordListFile passwordsText :confirmTask bruteForce bruteForceLenght customPasswords"  />  
+                        </p:selectBooleanCheckbox>  
+                    </p:column>
+                </p:row>
+                 <p:row>
+                    <p:column>
+                        <p:selectBooleanCheckbox id="customPasswords" 
+                                                 value="#{decryptionBean.customPasswords}" 
+                                                 itemLabel="Password list">  
+                            <p:ajax update="passwordListTextarea passwordListFile passwordsText :confirmTask bruteForce bruteForceLenght defaultPasswordList"  />  
                         </p:selectBooleanCheckbox>  
                     </p:column>
                 </p:row>
@@ -118,7 +130,7 @@
                             rows="5" 
                             cols="54" 
                             placeholder="Password list (one by line)"
-                            disabled="#{decryptionBean.defaultPasswordList or decryptionBean.bruteForce}" >
+                            disabled="#{!decryptionBean.customPasswords}" >
                             <p:ajax event="blur" update="passwordsText :confirmTask" />
                         </p:inputTextarea>
 
@@ -174,7 +186,8 @@
                                  icon="ui-icon-check"
                                  actionListener="#{decryptionBean.sendTask}"
                                  ajax="true"
-                                 oncomplete="PF('confirmTaskWidget').hide(); PF('progresBarDialog').show(); PF('pbAjax').start();"/>  
+                                 onstart="PF('confirmTaskWidget').hide();PF('progresBarDialog').show(); PF('pbAjax').start();"
+                                 />  
                 <p:commandButton value="No" 
                                  type="button" 
                                  styleClass="ui-confirmdialog-no" 

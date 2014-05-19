@@ -1,0 +1,62 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                template="template.xhtml">
+    <ui:define name="title">
+        Configuration - Isabel
+    </ui:define>
+    <ui:define name="content">
+        <h:form id="prime"  >
+            <h:panelGrid>
+                <p:row>
+                    <p:inputText id="number" 
+                                 placeholder="Number" 
+                                 size="50"
+                                 value="#{primeBean.number}" >
+                     <p:ajax event="blur" update=":confirmTask" />
+                    </p:inputText>
+                </p:row>
+                <p:row>
+                    <p:commandButton value="Start task" 
+                                     type="button"
+                                     id="submitTask" 
+
+                                     onclick="PF('confirmTaskWidget').show()" />
+                    <p:commandButton value="Reset params" 
+                                     process="@this" 
+                                     actionListener="#{primeBean.reset}"
+                                     update="number"/>
+                </p:row>
+            </h:panelGrid>
+
+        </h:form>
+
+        <p:confirmDialog global="false" 
+                         appendTo="@(body)"
+                         visible="false"
+                         id="confirmTask"
+                         widgetVar="confirmTaskWidget"
+                         header="Confirm task"
+                         message="Do you agree to start the task for the following number:"
+                         >
+            <h:form>
+                <h:outputText value="#{primeBean.number}"/><br/><br/>
+                <p:commandButton value="Yes" 
+
+                                 styleClass="ui-confirmdialog-yes" 
+                                 icon="ui-icon-check"
+                                 actionListener="#{primeBean.sendTask}"
+                                 ajax="true"
+                                 oncomplete="PF('confirmTaskWidget').hide(); PF('progresBarDialog').show(); PF('pbAjax').start();"/>  
+                <p:commandButton value="No" 
+                                 type="button" 
+                                 styleClass="ui-confirmdialog-no" 
+                                 icon="ui-icon-close"
+                                 onclick="PF('confirmTaskWidget').hide()"/>   
+            </h:form>
+        </p:confirmDialog>
+
+    </ui:define>
+</ui:composition>

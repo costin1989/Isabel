@@ -41,7 +41,10 @@ public class EncryptionBean implements Serializable {
     private String plainText;
     private String algorithm;
     private String secretKeyFactory;
+    private String secretKeySpecification;
     private String password;
+    private final String salt = "salt";
+    private int keyLength;
 
     public EncryptionBean() {
     }
@@ -60,6 +63,8 @@ public class EncryptionBean implements Serializable {
 
     public void setAlgorithm(String algorithm) {
         this.algorithm = algorithm;
+        this.keyLength = Integer.parseInt(algorithm.substring(algorithm.indexOf("(")+1, algorithm.indexOf(")")));
+        this.secretKeySpecification = algorithm.substring(0, 3);
     }
 
     public String getSecretKeyFactory() {
@@ -89,9 +94,9 @@ public class EncryptionBean implements Serializable {
     public void doEncrypt(){
          try {
             SecretKeyFactory factory = SecretKeyFactory.getInstance(secretKeyFactory);//"PBKDF2WithHmacSHA1"
-            KeySpec spec = new PBEKeySpec(password.toCharArray(),"salt".getBytes(), 1024, 128);
+            KeySpec spec = new PBEKeySpec(password.toCharArray(), salt.getBytes(), 1024, keyLength);
             SecretKey tmp = factory.generateSecret(spec);
-            SecretKey skeySpec = new SecretKeySpec(tmp.getEncoded(), algorithm.substring(0, 3));//"AES"
+            SecretKey skeySpec = new SecretKeySpec(tmp.getEncoded(), secretKeySpecification);//"AES"
 
             // build the initialization vector.  This example is all zeros, but it 
             // could be any value or generated using a random number generator.
@@ -103,7 +108,7 @@ public class EncryptionBean implements Serializable {
             cipher.init(Cipher.ENCRYPT_MODE, skeySpec, ivspec);
 
             // encrypt the message
-            byte[] encrypted = cipher.doFinal(encryptedText.getBytes());
+            byte[] encrypted = cipher.doFinal(plainText.getBytes());
 
             encryptedText = Base64.encodeBase64String(encrypted);
         } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | InvalidAlgorithmParameterException | IllegalBlockSizeException | BadPaddingException | InvalidKeySpecException ex) {

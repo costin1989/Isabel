@@ -12,7 +12,6 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 import org.apache.commons.codec.binary.Base64;
-import org.primefaces.event.FlowEvent;
 
 /**
  *
@@ -59,7 +58,6 @@ public class HashBean implements Serializable {
     }
 
    public void doHash(){
-       
        try{
            MessageDigest md = MessageDigest.getInstance(hashAlgorithm);
            md.update(plainText.getBytes());
@@ -69,6 +67,4 @@ public class HashBean implements Serializable {
            System.out.println(ex.getMessage());
        }
    }
-       
-   
 }

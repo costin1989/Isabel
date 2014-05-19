@@ -20,7 +20,7 @@ import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 import org.primefaces.event.FileUploadEvent;
-import ro.ase.dis.server.EncryptFile;
+import ro.ase.dis.objects.EncryptionMessageObject;
 import ro.ase.dis.server.MessageSubjectSender;
 import ro.ase.dis.server.MessageTaskSender;
 import ro.ase.dis.server.PasswordReader;
@@ -41,21 +41,25 @@ public class DecryptionBean implements Serializable {
     private String passwordList;
     private String algorithm;
     private String secretKeyFactory;
+    private String secretKeySpecification;
+    private int keyLength;
+    private final String salt = "salt";
     private long passwords;
     private boolean defaultPasswordList;
+    private boolean customPasswords;
     private final int defaultPasswords = 2151221;
     private Integer progress;
     private boolean bruteForce = true;
     private String bruteForceLength;
     private final int validationThreshold = 2;
     private final int bunchSize = 10;
-    private final int maxPasswordsLength = 2;
 
-    private enum taskTypes {
+    private enum TaskTypes {
 
-        BRUTE_FORCE, DICTIONARY
+        BRUTE_FORCE, DICTIONARY, CUSTOM_LIST
     };
-    private final taskTypes taskType = taskTypes.BRUTE_FORCE;
+    private TaskTypes taskType = TaskTypes.BRUTE_FORCE;
+    static char[] alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJDKMNOPQRSTUVWXYZ0123456789".toCharArray();
 
     @EJB
     MessageTaskSender taskSender;
@@ -80,10 +84,10 @@ public class DecryptionBean implements Serializable {
 
     public void setPasswordList(String passwordList) {
         this.passwordList = passwordList;
-        setPasswordsCount();
+        setCustomPasswordsCount();
     }
 
-    private void setPasswordsCount() {
+    private void setCustomPasswordsCount() {
         this.passwords = (this.passwordList == null || "".equals(this.passwordList)) ? 0 : this.passwordList.split("\r\n").length;
     }
 
@@ -102,10 +106,13 @@ public class DecryptionBean implements Serializable {
     public void setDefaultPasswordList(boolean defaultPasswordList) {
         this.defaultPasswordList = defaultPasswordList;
         if (defaultPasswordList) {
-            this.passwords = this.defaultPasswords;
-        } else {
-            setPasswordsCount();
+            this.bruteForce = false;
+            this.customPasswords = false;
         }
+        if (defaultPasswordList) {
+            this.passwords = this.defaultPasswords;
+        }
+        this.taskType = TaskTypes.DICTIONARY;
     }
 
     public int getDefaultPasswords() {
@@ -114,6 +121,8 @@ public class DecryptionBean implements Serializable {
 
     public void setAlgorithm(String algorithm) {
         this.algorithm = algorithm;
+        this.keyLength = Integer.parseInt(algorithm.substring(algorithm.indexOf("(")+1, algorithm.indexOf(")")));
+        this.secretKeySpecification = algorithm.substring(0, 3);
     }
 
     public String getSecretKeyFactory() {
@@ -130,6 +139,16 @@ public class DecryptionBean implements Serializable {
 
     public void setBruteForce(boolean bruteForce) {
         this.bruteForce = bruteForce;
+        if (bruteForce) {
+            this.defaultPasswordList = false;
+            this.customPasswords = false;
+            setBruteForcePasswordsCount();
+        }
+        this.taskType = TaskTypes.BRUTE_FORCE;
+    }
+
+    private void setBruteForcePasswordsCount() throws NumberFormatException {
+        this.passwords = this.bruteForceLength == null ? 0 : (long) Math.pow(alphabet.length, Integer.parseInt(this.bruteForceLength));
     }
 
     public String getBruteForceLength() {
@@ -138,7 +157,21 @@ public class DecryptionBean implements Serializable {
 
     public void setBruteForceLength(String bruteForceLength) {
         this.bruteForceLength = bruteForceLength;
-        this.passwords = (long) Math.pow(26, Integer.parseInt(this.bruteForceLength));
+        setBruteForcePasswordsCount();
+    }
+
+    public boolean isCustomPasswords() {
+        return customPasswords;
+    }
+
+    public void setCustomPasswords(boolean customPasswords) {
+        this.customPasswords = customPasswords;
+        if (customPasswords) {
+            this.defaultPasswordList = false;
+            this.bruteForce = false;
+            setCustomPasswordsCount();
+        }
+        this.taskType = TaskTypes.CUSTOM_LIST;
     }
 
     public void encryptedTextFileUploadListener(FileUploadEvent event) {
@@ -154,7 +187,7 @@ public class DecryptionBean implements Serializable {
         try {
             StringBuilder sb = readFileUploadEvent(event);
             this.passwordList = sb.toString();
-            setPasswordsCount();
+            setCustomPasswordsCount();
         } catch (IOException ex) {
             System.out.println(ex.getMessage());
         }
@@ -189,15 +222,15 @@ public class DecryptionBean implements Serializable {
             t.schedule(new TimerTask() {
                 @Override
                 public void run() {
-                    String encryptMessage = EncryptFile.getEncryptFile();
-                    subjectSender.sendMessage(encryptMessage);
-                    System.out.println("Subject sent:" + encryptMessage + " Time: " + new Date().getTime());
+                    EncryptionMessageObject m = new EncryptionMessageObject(encryptedText, algorithm, salt, secretKeyFactory, secretKeySpecification, keyLength);
+                    subjectSender.sendMessage(m);
+                    System.out.println("Subject sent:" + m + " Time: " + new Date().getTime());
                 }
             }, 1000 * 30, 1000 * 30);
 
-            String encryptMessage = EncryptFile.getEncryptFile();
-            subjectSender.sendMessage(encryptMessage);
-            System.out.println("Subject sent:" + encryptMessage + " Time: " + new Date().getTime());
+            EncryptionMessageObject m = new EncryptionMessageObject(encryptedText, algorithm, salt, secretKeyFactory, secretKeySpecification, keyLength);
+            subjectSender.sendMessage(m);
+            System.out.println("Subject sent:" + m + " Time: " + new Date().getTime());
 
             taskSender.connect();
             switch (taskType) {
@@ -205,7 +238,10 @@ public class DecryptionBean implements Serializable {
                     dictionaryTaskSender();
                     break;
                 case BRUTE_FORCE:
-                    bruteForceTaskSender(maxPasswordsLength);
+                    bruteForceTaskSender(Integer.parseInt(bruteForceLength));
+                    break;
+                case CUSTOM_LIST:
+                    customListTaskSender();
                     break;
             }
 
@@ -218,36 +254,41 @@ public class DecryptionBean implements Serializable {
             t.cancel();
         }
     }
-    
+
     private void dictionaryTaskSender() {
         for (int i = 0; i < 500; i++) {
             String message = "";
             for (int j = 0; j < bunchSize; j++) {
                 message += PasswordReader.getInstance().readPassword() + ",";
+                passwordCounter += 1;
             }
             message += PasswordReader.getInstance().readPassword();
+            passwordCounter += 1;
             for (int k = 0; k < validationThreshold; k++) {
                 taskSender.sendMessage(message);
             }
-
-            passwordCounter += validationThreshold * bunchSize;
         }
     }
 
-    private void bruteForceTaskSender(int maxPasswordsLength)  {
-        if(maxPasswordsLength < 1){
+    private void customListTaskSender() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    private void bruteForceTaskSender(int maxPasswordsLength) {
+        if (maxPasswordsLength < 1) {
             throw new IllegalArgumentException();
         }
         createWords("", maxPasswordsLength);
     }
 
     private void createWords(String base, int maxPasswordsLength) {
-        for(char c='a';c<='z';c++){
-            if(maxPasswordsLength == 1){
-                taskSender.sendMessage(base+c);
+        for (char c : alphabet) {
+            if (maxPasswordsLength == 1) {
+                taskSender.sendMessage(base + c);
                 passwordCounter += 1;
+                progress = Long.valueOf(passwordCounter).intValue()/Long.valueOf(passwords).intValue()*100;
             } else {
-                createWords(base+c, maxPasswordsLength-1);
+                createWords(base + c, maxPasswordsLength - 1);
             }
         }
     }

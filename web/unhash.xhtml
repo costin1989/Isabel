@@ -8,52 +8,45 @@
         Configuration - Isabel
     </ui:define>
     <ui:define name="content">
-       <h:form id="toolsHash"  >
+        <h:form id="unhash"  >
             <h:panelGrid>
-                 <p:row>
+                <p:row>
                     <p:column >
-                        <p:selectOneMenu id="hashAlgorithm" value="#{hashBean.hashAlgorithm}" style="width: 450px;" >  
+                        <p:selectOneMenu id="hashAlgorithm" value="#{unhashBean.hashAlgorithm}" style="width: 450px;" >  
                             <f:selectItem  itemLabel="Select hash algorithm" itemValue="" />  
                             <f:selectItem itemLabel="MD2" itemValue="MD2" /> 
                             <f:selectItem itemLabel="MD5" itemValue="MD5" />  
                             <f:selectItem itemLabel="SHA-128" itemValue="SHA-1" />  
                             <f:selectItem itemLabel="SHA-256" itemValue="SHA-256" />  
                             <f:selectItem itemLabel="SHA-512" itemValue="SHA-512" /> 
+                            <p:ajax event="change" update=":confirmTask" />
                         </p:selectOneMenu>  
                     </p:column>
                 </p:row>
                 <p:row>
                     <p:column>
                         <p:inputTextarea 
-                            value="#{hashBean.plainText}"
+                            value="#{unhashBean.hashText}"
                             autoResize="false"  
                             scrollHeight="100" 
                             id="plainText" 
                             rows="2" 
                             cols="54" 
-                            placeholder="Plain text">
+                            placeholder="Hash text">
+                            <p:ajax event="blur" update=":confirmTask" />
                         </p:inputTextarea>
                     </p:column>
                 </p:row>
                 <p:row>
-                    <p:column>
-                        <p:inputTextarea 
-                            value="#{hashBean.hashText}"
-                            autoResize="false"  
-                            scrollHeight="100" 
-                            id="hashText" 
-                            rows="2" 
-                            cols="54" 
-                            placeholder="Encrypted text">
-                        </p:inputTextarea>
-                    </p:column>
-                </p:row>
-                <p:row>
-                    <p:commandButton value="Hash" 
+                    <p:commandButton value="Start task" 
+                                     type="button"
                                      id="submitTask" 
-                                     actionListener="#{hashBean.doHash}"
-                                     update="hashText"
-                                     />
+
+                                     onclick="PF('confirmTaskWidget').show()" />
+                    <p:commandButton value="Reset params" 
+                                     process="@this" 
+                                     actionListener="#{unhashBean.reset}"
+                                     update="unhash"/>
                 </p:row>
             </h:panelGrid>
 
@@ -68,14 +61,12 @@
                          message="Do you agree to start the task with following parameters:"
                          >
             <h:form>
-                <h:outputText value="#{taskBean.algorithm} encryption algorithm"/><br/>
-                <h:outputText value="#{taskBean.secretKeyFactory} secret key factory algorithm"/><br/>
-                <h:outputText value="#{taskBean.passwords} passwords"/><br/><br/>
+                <h:outputText value="#{unhashBean.hashAlgorithm} - hash algorithm"/><br/>
+                <h:outputText value="#{unhashBean.hashText} - hash text"/><br/><br/>
                 <p:commandButton value="Yes" 
-
                                  styleClass="ui-confirmdialog-yes" 
                                  icon="ui-icon-check"
-                                 actionListener="#{taskBean.sendTask}"
+                                 actionListener="#{unhashBean.sendTask}"
                                  ajax="true"
                                  oncomplete="PF('confirmTaskWidget').hide(); PF('progresBarDialog').show(); PF('pbAjax').start();"/>  
                 <p:commandButton value="No" 
@@ -85,13 +76,5 @@
                                  onclick="PF('confirmTaskWidget').hide()"/>   
             </h:form>
         </p:confirmDialog>
-
-        <p:dialog id="progresBar" widgetVar="progresBarDialog" visible="true" modal="false" >
-            <p:progressBar widgetVar="pbAjax" ajax="true" value="#{taskBean.progress}" labelTemplate="{value}%" styleClass="progresBar" global="false">
-                <p:ajax event="complete" listener="#{taskBean.onComplete}" update="growl" oncomplete="startButton2.enable()"/>
-            </p:progressBar>
-        </p:dialog>
-
-
     </ui:define>
 </ui:composition>
