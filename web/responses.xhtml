@@ -1,0 +1,41 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                template="template.xhtml">
+    <ui:define name="title">
+        Responses - Isabel
+    </ui:define>
+    <ui:define name="content">
+        <h:form id="toolsHash"  >
+            <h:panelGrid>
+                
+                <p:row>
+                    <p:column>
+                        <p:inputTextarea 
+                            value="#{responsesBean.responses}"
+                            autoResize="false"  
+                            scrollHeight="100" 
+                            id="plainText" 
+                            rows="10" 
+                            cols="54" 
+                            placeholder="No responses available">
+                        </p:inputTextarea>
+                    </p:column>
+                </p:row>
+               
+                <p:row>
+                    <p:commandButton value="Get Last Responses" 
+                                     id="submitTask" 
+                                     actionListener="#{responsesBean.updateResponses}"
+                                     update="plainText"
+                                     />
+                </p:row>
+            </h:panelGrid>
+
+        </h:form>
+
+
+    </ui:define>
+</ui:composition>

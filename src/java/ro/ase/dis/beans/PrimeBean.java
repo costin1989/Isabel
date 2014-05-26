@@ -112,7 +112,7 @@ public class PrimeBean implements Serializable {
                 }
                 primeBig = new BigInteger(prime);
                 for (int k = 0; k < validationThreshold; k++) {
-                        taskSender.sendMessage(prime);
+                        taskSender.sendMessage(task);
                     }
             } while (primeBig.compareTo(sqrt) < 0);
         } catch (IOException ex) {

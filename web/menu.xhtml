@@ -7,7 +7,7 @@
 
     <h:form id="menuForm">
         <p:menubar id="menubar" autoDisplay="true" >
-            <p:menuitem id="loginMenu" icon="ui-icon-unlock" value="Autentificare"/>
+            
             <p:menuitem id="homeMenu" icon="ui-icon-home" value="Home" url="index.xhtml"/>
             <p:submenu label="Task">
                 <p:menuitem value="Decrypt" url="decryption.xhtml"/>
@@ -19,6 +19,7 @@
                 <p:menuitem value="GetEncrypted" url="encryption.xhtml"/>
                 <p:menuitem value="GetHash" url="hash.xhtml"/>
             </p:submenu>
+            <p:menuitem value="Responses" url="responses.xhtml"/>
         </p:menubar>
     </h:form>
 </ui:composition>

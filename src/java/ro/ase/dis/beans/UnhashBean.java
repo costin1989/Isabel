@@ -10,11 +10,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Serializable;
-import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.ejb.EJB;
 import javax.faces.bean.ManagedBean;
 import javax.faces.view.ViewScoped;
@@ -105,7 +102,7 @@ public class UnhashBean implements Serializable {
         try {
             InputStream is = PasswordReader.class.getResourceAsStream("dict");
             BufferedReader br = new BufferedReader(new InputStreamReader(is));
-            for (int i = 0; i < 500; i++) {
+            for (int i = 0; i < 50000; i++) {
                 String word = "";
                 for (int j = 0; j < bunchSize; j++) {
                     word += br.readLine()+",";
